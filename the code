@@ -1,0 +1,51 @@
+import pandas as pd
+import re
+
+#import dataset 
+df = pd.read_excel("---your path---.xlsx")
+
+#rename
+df.rename({"seller-sku": "sku"}, axis=1, inplace=True)
+df.rename({"product-id": "add-delete"}, axis=1, inplace=True)
+df["add-delete"]="x"
+
+#na removal
+df2 = df[(df["item-name"].isna())]
+
+#control
+df2["item-name"].count()
+
+
+#duplicate removal
+
+#wrt asin1
+df["dupli"]=(df.duplicated(subset=["asin1"]))
+df3 = df.loc[df["dupli"] == True]
+df3.count()
+
+#control
+pd.set_option('display.max_rows', None)
+pd.set_option('max_colwidth', None)
+df3
+
+#choose one to control
+sum(df["asin1"]== "6059372597") - sum(df3["asin1"]== "6059372597")
+
+#wrt item-name
+df["dupli"]=(df.duplicated(subset=["item-name"]))
+df4 = df.loc[df["dupli"] == True]
+df4.count()
+df4
+
+sum(df["item-name"]== "11. Sınıf Fizik Set [Paperback] Kolektif") - sum(df4["item-name"]== "11. Sınıf Fizik Set [Paperback] Kolektif")
+
+
+#export in required Amazon format
+df2 = df2.drop(columns=["asin1","item-name"])
+df2.to_excel(r"---your path---df2.xlsx", index=False)
+
+df3 = df3.drop(columns=["asin1", "item-name", "dupli"])
+df3.to_excel(rr"---your path---df3.xlsx", index=False)
+
+df4 = df4.drop(columns=["asin1", "item-name", "dupli"])
+df4.to_excel(r"---your path---df4.xlsx", index=False)
